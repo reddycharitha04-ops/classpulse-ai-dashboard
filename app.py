@@ -2,38 +2,12 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from datetime import datetime
+import time
 
 # -------------------------
 # PAGE CONFIG
 # -------------------------
 st.set_page_config(page_title="ClassPulse AI", layout="wide")
-
-# -------------------------
-# CUSTOM STYLING
-# -------------------------
-st.markdown("""
-<style>
-body {
-    background-color: #F9FAFB;
-}
-.metric-card {
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
-    text-align: center;
-}
-.alert-box {
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-.red { background-color: #FEE2E2; color: #B91C1C; }
-.yellow { background-color: #FEF3C7; color: #92400E; }
-.green { background-color: #D1FAE5; color: #065F46; }
-</style>
-""", unsafe_allow_html=True)
 
 # -------------------------
 # HEADER
@@ -42,20 +16,23 @@ col1, col2, col3 = st.columns([6,2,2])
 
 with col1:
     st.title("🧠 ClassPulse AI Dashboard")
-    st.caption("DSA - Section A")
+    st.caption("DSA - Section A | Hybrid Classroom")
 
 with col2:
-    st.write("🔴 Live Class")
+    st.write("🔴 Live")
 
 with col3:
     privacy = st.toggle("🔒 Privacy Mode")
 
 # -------------------------
-# MOCK DATA
+# MOCK DATA (SIMULATION)
 # -------------------------
 students = 60
-engagement = np.random.randint(50, 100)
-confusion = np.random.randint(10, 70)
+
+engagement = np.random.randint(40, 100)
+confusion = np.random.randint(10, 80)
+confidence = 100 - confusion
+
 attendance = np.random.randint(40, 60)
 participation = np.random.randint(30, 90)
 
@@ -63,7 +40,20 @@ topics = ["Recursion", "Sorting", "Graphs", "DP"]
 understanding = np.random.randint(30, 90, size=4)
 
 # -------------------------
-# METRICS ROW
+# MULTI-MODAL INPUT STATUS
+# -------------------------
+st.subheader("🧠 Multi-Modal Understanding Engine")
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+col1.metric("👁️ Face Signals", "Active" if not privacy else "Disabled")
+col2.metric("📝 Quiz Data", "Active")
+col3.metric("⏱️ Response Time", "Tracking")
+col4.metric("🖱️ Activity", "Tracking")
+col5.metric("🎤 Audio", "Listening")
+
+# -------------------------
+# OVERVIEW METRICS
 # -------------------------
 st.subheader("📊 Class Overview")
 
@@ -71,32 +61,34 @@ col1, col2, col3, col4 = st.columns(4)
 
 col1.metric("Engagement", f"{engagement}%")
 col2.metric("Confusion", f"{confusion}%")
-col3.metric("Attendance", f"{attendance}/{students}")
-col4.metric("Participation", f"{participation}%")
+col3.metric("Confidence", f"{confidence}%")
+col4.metric("Attendance", f"{attendance}/{students}")
 
 # -------------------------
 # ALERTS
 # -------------------------
-st.subheader("🚨 Alerts")
+st.subheader("🚨 Intelligent Alerts")
 
-if confusion > 60:
-    st.markdown('<div class="alert-box red">⚠️ High confusion detected</div>', unsafe_allow_html=True)
-elif confusion > 40:
-    st.markdown('<div class="alert-box yellow">⚠️ Moderate confusion</div>', unsafe_allow_html=True)
+if confusion > 65:
+    st.error("⚠️ High confusion detected across class")
+elif confusion > 45:
+    st.warning("⚠️ Moderate confusion emerging")
 else:
-    st.markdown('<div class="alert-box green">✅ Class understanding is good</div>', unsafe_allow_html=True)
+    st.success("✅ Students understanding well")
 
 if engagement < 60:
-    st.markdown('<div class="alert-box red">⚠️ Engagement dropped</div>', unsafe_allow_html=True)
+    st.error("⚠️ Engagement drop detected")
+
+if participation < 40:
+    st.warning("⚠️ Low participation")
 
 # -------------------------
-# MAIN GRID
+# CONCEPT ANALYTICS
 # -------------------------
 col1, col2 = st.columns(2)
 
-# Concept understanding
 with col1:
-    st.subheader("📈 Concept Understanding")
+    st.subheader("📈 Concept-Level Understanding")
 
     df = pd.DataFrame({
         "Topic": topics,
@@ -106,45 +98,90 @@ with col1:
     fig = px.bar(df, x="Topic", y="Understanding", text="Understanding")
     st.plotly_chart(fig, use_container_width=True)
 
-# Engagement timeline
 with col2:
     st.subheader("⏳ Engagement Timeline")
 
     time_data = pd.DataFrame({
         "Time": [f"{i} min" for i in range(1, 11)],
-        "Engagement": np.random.randint(50, 100, 10)
+        "Engagement": np.random.randint(40, 100, 10)
     })
 
     fig2 = px.line(time_data, x="Time", y="Engagement", markers=True)
     st.plotly_chart(fig2, use_container_width=True)
 
 # -------------------------
-# SMART RECORDING
+# SMART RECORDING (CAMERA MODE)
 # -------------------------
-st.subheader("🎥 Smart Recording Highlights")
+st.subheader("🎥 Smart Class Recording")
 
-st.info("10:05 → High confusion spike")
-st.info("10:15 → Important explanation")
-st.info("10:25 → Peak engagement")
+camera_mode = st.toggle("Enable Camera Mode")
 
-# -------------------------
-# AI SUGGESTIONS
-# -------------------------
-st.subheader("💡 AI Teaching Suggestions")
+if camera_mode:
+    st.success("📷 Recording with AI analysis enabled")
 
-if confusion > 60:
-    st.write("👉 Repeat the concept with simpler example")
-elif engagement < 60:
-    st.write("👉 Ask a question to re-engage students")
+    st.info("10:05 → High confusion moment")
+    st.info("10:15 → Important explanation")
+    st.info("10:25 → Peak engagement")
+
+    st.write("🎯 Auto-generated revision clips available")
+
 else:
-    st.write("👉 Continue at current pace")
+    st.warning("Camera disabled → Using non-visual inputs")
+
+# -------------------------
+# ATTENDANCE INSIGHT
+# -------------------------
+st.subheader("🧾 Attendance + Engagement Insights")
+
+st.write(f"📊 Attendance: {attendance}/{students}")
+
+if attendance < 45:
+    st.warning("Low attendance correlates with higher confusion")
+
+# -------------------------
+# DISTRACTION / ENGAGEMENT PATTERN
+# -------------------------
+st.subheader("📵 Engagement Pattern Detection")
+
+if engagement < 60:
+    st.error("⚠️ Overall class distraction detected")
+else:
+    st.success("✅ Class focused")
+
+st.write("Tracking interaction drops, inactivity, and response gaps (privacy-safe)")
+
+# -------------------------
+# AI TEACHER ASSISTANCE
+# -------------------------
+st.subheader("💡 Real-Time Teaching Suggestions")
+
+if confusion > 65:
+    st.write("👉 Repeat concept with simpler explanation")
+    st.write("👉 Give real-world example")
+elif engagement < 60:
+    st.write("👉 Ask interactive question")
+    st.write("👉 Start quick quiz")
+elif participation < 40:
+    st.write("👉 Encourage student participation")
+else:
+    st.write("👉 Continue current pace")
+
+# -------------------------
+# HYBRID CLASSROOM STATUS
+# -------------------------
+st.subheader("🌐 Hybrid Classroom Monitoring")
+
+st.write("👩‍🏫 Offline Students: 35")
+st.write("💻 Online Students: 25")
+
+st.success("Unified monitoring across physical + virtual classroom")
 
 # -------------------------
 # PRIVACY STATUS
 # -------------------------
-st.subheader("🔒 Privacy Mode Status")
+st.subheader("🔒 Privacy System")
 
 if privacy:
-    st.success("Running in privacy-safe mode (no camera)")
+    st.success("Privacy-safe mode active (no camera tracking)")
 else:
-    st.warning("Using multi-modal inputs (camera + interaction)")
+    st.warning("Multi-modal mode active (camera + interaction)")
